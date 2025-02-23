@@ -8,6 +8,7 @@ import {
   Req,
   Res,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { SignUpDto } from './dto/signup.dto';
@@ -42,5 +43,21 @@ export class AuthController {
   @Post('admin/signin')
   async adminSignin(@Body() data: SignInDto, @Res() res: Response) {
     return this.authService.adminSignin(data, res);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
+  @Post('admin/create')
+  async createAdmin(@Body() data: SignUpDto, @Req() req: Request) {
+    const user = req.user as {
+      id: string;
+      name: string;
+      number: string;
+      permissions: any[];
+    };
+    if (!user.permissions?.includes('ADMIN_ADMIN'))
+      throw new UnauthorizedException('Permmission Denied.');
+
+    return this.authService.createAdmin(data);
   }
 }

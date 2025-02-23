@@ -3,6 +3,7 @@ import {
   Injectable,
   HttpStatus,
   UnauthorizedException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '@/prisma.service';
 import { hash, compare } from 'bcrypt';
@@ -25,7 +26,7 @@ export class AuthService {
     });
 
     if (user) {
-      throw new HttpException('User already exists', HttpStatus.CONFLICT);
+      throw new ConflictException('User already exists');
     }
 
     // Create user
@@ -130,5 +131,20 @@ export class AuthService {
       number: admin.number,
       name: admin.name,
     });
+  }
+
+  async createAdmin(data: { number: string; password: string; name: string }) {
+    const admin = await this.prisma.admin.findFirst({
+      where: { number: data.number },
+    });
+
+    if (admin) {
+      throw new ConflictException('User already exits.');
+    }
+
+    data.password = await hash(data.password, 10);
+    const newAdmin = await this.prisma.admin.create({ data });
+
+    return newAdmin;
   }
 }
