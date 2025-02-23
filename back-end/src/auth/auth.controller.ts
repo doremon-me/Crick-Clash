@@ -32,9 +32,15 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.ACCEPTED)
-  @Get('verify')
   @UseGuards(AuthGuard)
+  @Get('verify')
   async verify(@Req() req: Request) {
     return req.user;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('admin/signin')
+  async adminSignin(@Body() data: SignInDto, @Res() res: Response) {
+    return this.authService.adminSignin(data, res);
   }
 }

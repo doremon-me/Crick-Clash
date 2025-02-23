@@ -38,7 +38,11 @@ export class AuthService {
       },
     });
 
-    const payload = { id: newUser.id, name: newUser.name, number: newUser.number };
+    const payload = {
+      id: newUser.id,
+      name: newUser.name,
+      number: newUser.number,
+    };
     const token = this.jwtService.sign(payload);
 
     res.cookie('accessToken', token, {
@@ -88,6 +92,43 @@ export class AuthService {
       id: user.id,
       number: user.number,
       name: user.name,
+    });
+  }
+
+  async adminSignin(data: { number: string; password: string }, res: Response) {
+    const admin = await this.prisma.admin.findFirst({
+      where: { number: data.number },
+    });
+
+    if (!admin) {
+      throw new UnauthorizedException('User not found', 'number');
+    }
+
+    if (!(await compare(data.password, admin.password))) {
+      throw new UnauthorizedException('Wrong password', 'password');
+    }
+
+    const payload = {
+      id: admin.id,
+      name: admin.name,
+      number: admin.number,
+      permissions: admin.permissions,
+    };
+    const token = this.jwtService.sign(payload);
+
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: process.env.ENV !== 'development',
+      sameSite: 'strict',
+      priority: 'high',
+      signed: true,
+      partitioned: process.env.ENV !== 'development',
+    });
+
+    return res.status(200).json({
+      id: admin.id,
+      number: admin.number,
+      name: admin.name,
     });
   }
 }
