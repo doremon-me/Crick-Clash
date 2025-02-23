@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,8 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.use(cookieParser(process.env.PARSER_SECRET || 'PARSER_SECRET'));
 
   app.enableCors({
     origin: ['http://192.168.31.101:5173'],

@@ -19,7 +19,7 @@ import { useSignup } from "@/api/auth.api";
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const signinForm = useForm({
+  const signupForm = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       number: "",
@@ -28,7 +28,7 @@ const SignupPage = () => {
     },
   });
 
-  const { mutate: signupFun } = useSignup();
+  const { mutate: signupFun } = useSignup(signupForm.setError);
 
   return (
     <Card className="min-w-[300px] w-96">
@@ -37,13 +37,13 @@ const SignupPage = () => {
         <CardDescription>You can create new account here.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...signinForm}>
+        <Form {...signupForm}>
           <form
-            onSubmit={signinForm.handleSubmit((e) => signupFun(e))}
+            onSubmit={signupForm.handleSubmit((e) => signupFun(e))}
             className="w-full space-y-4"
           >
             <FormField
-              control={signinForm.control}
+              control={signupForm.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -59,7 +59,7 @@ const SignupPage = () => {
               )}
             />
             <FormField
-              control={signinForm.control}
+              control={signupForm.control}
               name="number"
               render={({ field }) => (
                 <FormItem>
@@ -75,7 +75,7 @@ const SignupPage = () => {
               )}
             />
             <FormField
-              control={signinForm.control}
+              control={signupForm.control}
               name="password"
               render={({ field }) => (
                 <FormItem>

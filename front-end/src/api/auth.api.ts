@@ -26,16 +26,17 @@ export const useSignin = (setError: UseFormSetError<TSingin>) => {
             onClick: () => window.location.reload(),
           },
         });
+        return;
       }
 
-      if (response?.status === 401) {
-        const { error, message } = response?.data as {
+      if (response.status === 401) {
+        const { error, message } = response.data as {
           message: string;
           error: "number" | "password";
         };
         setError(error, { message });
       } else {
-        const { error, message } = response?.data as {
+        const { error, message } = response.data as {
           message: string;
           error: string;
         };
@@ -52,15 +53,38 @@ const signup = async (data: TSingup) => {
   return response.data;
 };
 
-export const useSignup = () => {
+export const useSignup = (setError: UseFormSetError<TSingup>) => {
   return useMutation({
     mutationKey: ["signup"],
     mutationFn: signup,
     onSuccess: (data) => {
       console.log(data);
     },
-    onError: (error) => {
-      console.log(error);
+    onError: ({ response }: AxiosError) => {
+      if (!response) {
+        toast("No response from the server.", {
+          description: "Server did not responed to your request.",
+          action: {
+            label: "Refresh",
+            onClick: () => window.location.reload(),
+          },
+        });
+        return;
+      }
+
+      if (response.status === 409) {
+        setError("number", {
+          message: "Number already in use.",
+        });
+      } else {
+        const { error, message } = response.data as {
+          message: string;
+          error: string;
+        };
+        toast(error, {
+          description: message,
+        });
+      }
     },
   });
 };
