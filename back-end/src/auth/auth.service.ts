@@ -1,4 +1,9 @@
-import { HttpException, Injectable, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '@/prisma.service';
 import { hash, compare } from 'bcrypt';
 
@@ -39,12 +44,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('User not found', 'number');
     }
 
     // Check password
     if (!(await compare(data.password, user.password))) {
-      throw new UnauthorizedException('Wrong password');
+      throw new UnauthorizedException('Wrong password', 'password');
     }
 
     return {

@@ -27,7 +27,7 @@ const SigninPage = () => {
     },
   });
 
-  const { mutate: SinginFun } = useSignin();
+  const { mutate: SinginFun } = useSignin(signinForm.setError);
 
   return (
     <Card className="min-w-[300px] w-96">
